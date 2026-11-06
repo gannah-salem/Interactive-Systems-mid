@@ -1,0 +1,1980 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بنك أسئلة Interactive Systems Design - مراجعة تفاعلية</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-hover: #4338ca;
+      --primary-light: #e0e7ff;
+      --success: #10b981;
+      --success-light: #d1fae5;
+      --danger: #ef4444;
+      --danger-light: #fee2e2;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --radius: 16px;
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.05);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background: var(--bg);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 16px;
+    }
+    .container { width: 100%; max-width: 800px; margin: 0 auto; }
+    header {
+      background: white;
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border: 1px solid var(--border);
+      text-align: center;
+    }
+    header h1 { font-size: 1.4rem; font-weight: 800; color: #1e1b4b; line-height: 1.4; }
+    header p { font-size: 0.95rem; color: var(--text-muted); }
+    .badge-count {
+      display: inline-block;
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      width: fit-content;
+      margin: 4px auto 0;
+    }
+    .card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      margin-bottom: 20px;
+      transition: all 0.2s ease;
+    }
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin: 20px 0;
+    }
+    @media (min-width: 640px) { .settings-grid { grid-template-columns: 1fr 1fr; } }
+    .setting-group { background: #f1f5f9; padding: 16px; border-radius: 12px; }
+    .setting-group h3 { font-size: 1rem; margin-bottom: 12px; color: #334155; display: flex; align-items: center; gap: 8px; }
+    .radio-pill-group { display: flex; flex-direction: column; gap: 8px; }
+    .radio-label {
+      display: flex;
+      align-items: center;
+      padding: 10px 14px;
+      background: white;
+      border-radius: 10px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 600;
+      transition: all 0.15s ease;
+    }
+    .radio-label input { margin-left: 10px; accent-color: var(--primary); width: 18px; height: 18px; }
+    .radio-label:hover { border-color: #cbd5e1; }
+    .radio-label.selected { border-color: var(--primary); background: var(--primary-light); color: var(--primary); }
+    .btn-start {
+      width: 100%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 16px;
+      font-size: 1.15rem;
+      font-weight: 700;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+    .btn-start:hover { background: var(--primary-hover); transform: translateY(-1px); }
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      font-weight: 700;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+    .progress-bar-container {
+      width: 100%;
+      height: 8px;
+      background: #e2e8f0;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+    .progress-bar-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s ease; }
+    .q-box { margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px dashed var(--border); }
+    .q-box:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .q-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 16px;
+      line-height: 1.5;
+      direction: ltr;
+      text-align: left;
+      font-family: 'Inter', sans-serif;
+    }
+    .q-number-tag {
+      display: inline-block;
+      background: #334155;
+      color: white;
+      font-size: 0.8rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 6px;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    .options-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+    .opt-btn {
+      background: #ffffff;
+      border: 1.5px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 16px;
+      text-align: left;
+      direction: ltr;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #1e293b;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.15s ease;
+    }
+    .opt-btn:hover:not(:disabled) { border-color: var(--primary); background: #f8faff; }
+    .opt-letter {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: #f1f5f9;
+      font-weight: 700;
+      color: #475569;
+      margin-right: 12px;
+      flex-shrink: 0;
+    }
+    .opt-btn.correct { background: var(--success-light) !important; border-color: var(--success) !important; color: #065f46 !important; font-weight: 600; }
+    .opt-btn.correct .opt-letter { background: var(--success); color: white; }
+    .opt-btn.wrong { background: var(--danger-light) !important; border-color: var(--danger) !important; color: #991b1b !important; font-weight: 600; }
+    .opt-btn.wrong .opt-letter { background: var(--danger); color: white; }
+    .feedback-msg { margin-top: 12px; padding: 10px 14px; border-radius: 10px; font-size: 0.95rem; font-weight: 700; display: none; animation: fadeIn 0.25s ease; }
+    .feedback-msg.correct { display: flex; align-items: center; gap: 8px; background: var(--success-light); color: #065f46; }
+    .feedback-msg.wrong { display: flex; align-items: center; gap: 8px; background: var(--danger-light); color: #991b1b; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+    .nav-buttons { display: flex; justify-content: space-between; gap: 12px; margin-top: 24px; }
+    .btn-secondary {
+      background: white;
+      color: #334155;
+      border: 1.5px solid var(--border);
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s ease;
+    }
+    .btn-secondary:hover:not(:disabled) { background: #f1f5f9; border-color: #cbd5e1; }
+    .btn-secondary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .result-hero { text-align: center; padding: 30px 10px; }
+    .score-circle {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      color: var(--primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      border: 4px solid var(--primary);
+      font-weight: 800;
+    }
+    .score-circle .score-num { font-size: 2rem; line-height: 1; }
+    .score-circle .score-label { font-size: 0.85rem; color: #4338ca; }
+    .stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 20px 0; }
+    .stat-pill { padding: 12px; border-radius: 12px; font-weight: 700; font-size: 1rem; text-align: center; }
+    .stat-pill.success { background: var(--success-light); color: #065f46; }
+    .stat-pill.danger { background: var(--danger-light); color: #991b1b; }
+    .wrong-review-section { margin-top: 30px; text-align: right; }
+    .wrong-review-title { font-size: 1.15rem; font-weight: 800; color: #991b1b; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .review-item {
+      background: #f8fafc;
+      border: 1px solid #fee2e2;
+      border-right: 4px solid var(--danger);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 14px;
+      direction: ltr;
+      text-align: left;
+      font-family: 'Inter', sans-serif;
+    }
+    .review-q { font-weight: 700; color: #1e293b; margin-bottom: 8px; }
+    .review-answer-row { font-size: 0.9rem; margin-top: 4px; }
+    .review-your-ans { color: var(--danger); font-weight: 600; }
+    .review-correct-ans { color: var(--success); font-weight: 700; }
+    .hidden { display: none !important; }
+    .sticky-submit {
+      position: sticky;
+      bottom: 16px;
+      background: white;
+      padding: 16px 20px;
+      border-radius: var(--radius);
+      box-shadow: 0 -4px 15px rgba(0,0,0,0.08);
+      border: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 24px;
+      z-index: 50;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>نظام المراجعة التفاعلي - بنك أسئلة الميدتيرم</h1>
+      <p>Interactive Systems Design (ISD) Mid-term Question Bank</p>
+      <div class="badge-count">120 سؤال تدريبي شامل</div>
+    </header>
+
+    <div id="screen-settings" class="card">
+      <h2 style="font-size: 1.25rem; font-weight: 800; color: #1e1b4b;">⚙️ إعدادات التدريب والاختبار</h2>
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 4px;">خصص طريقة المراجعة المناسبة لك قبل البدء:</p>
+
+      <div class="settings-grid">
+        <div class="setting-group">
+          <h3>📋 أسلوب العرض</h3>
+          <div class="radio-pill-group">
+            <label class="radio-label selected" id="lbl-mode-single">
+              <input type="radio" name="display-mode" value="single" checked onchange="updateSettingsUI()">
+              سؤال بسؤال (تفاعل فوري ومريح)
+            </label>
+            <label class="radio-label" id="lbl-mode-all">
+              <input type="radio" name="display-mode" value="all" onchange="updateSettingsUI()">
+              عرض الأسئلة كلها مرة واحدة (شيت كامل)
+            </label>
+          </div>
+        </div>
+
+        <div class="setting-group">
+          <h3>🔀 ترتيب الأسئلة</h3>
+          <div class="radio-pill-group">
+            <label class="radio-label selected" id="lbl-order-seq">
+              <input type="radio" name="order-mode" value="seq" checked onchange="updateSettingsUI()">
+              بالترتيب الأصلي (من Q1 إلى Q120)
+            </label>
+            <label class="radio-label" id="lbl-order-rand">
+              <input type="radio" name="order-mode" value="rand" onchange="updateSettingsUI()">
+              عشوائي (Randomized لتثبيت الفهم)
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-start" onclick="startQuiz()">🚀 ابدأ التدريب الآن</button>
+    </div>
+
+    <div id="screen-quiz" class="hidden">
+      <div id="single-header-info" class="card" style="padding: 16px 20px; margin-bottom: 16px;">
+        <div class="quiz-header">
+          <span id="q-counter-text">السؤال 1 من 120</span>
+          <span id="q-score-live" style="color: var(--primary); font-weight: 800;">الإجابات الصحيحة: 0</span>
+        </div>
+        <div class="progress-bar-container">
+          <div id="progress-fill" class="progress-bar-fill"></div>
+        </div>
+      </div>
+
+      <div id="questions-container"></div>
+
+      <div id="single-nav" class="card" style="padding: 16px 20px;">
+        <div class="nav-buttons">
+          <button id="btn-prev" class="btn-secondary" onclick="prevQuestion()" disabled>السابق</button>
+          <button id="btn-restart" class="btn-secondary" onclick="confirmRestart()">⚙️ تغيير الإعدادات</button>
+          <button id="btn-next" class="btn-primary" onclick="nextQuestion()">التالي ⬅️</button>
+        </div>
+      </div>
+
+      <div id="all-submit-bar" class="sticky-submit hidden">
+        <div>
+          <span id="all-answered-count" style="font-weight: 700; color: #334155;">تم الإجابة على 0 من 120</span>
+        </div>
+        <button class="btn-primary" onclick="finishQuiz()">إنهاء ورؤية النتيجة 🏁</button>
+      </div>
+    </div>
+
+    <div id="screen-result" class="card hidden">
+      <div class="result-hero">
+        <div class="score-circle">
+          <span id="final-percentage" class="score-num">0%</span>
+          <span class="score-label">النسبة المئوية</span>
+        </div>
+        <h2 id="result-message" style="font-size: 1.4rem; font-weight: 800; color: #1e1b4b;"></h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 6px;">ملخص تدريبك على بنك أسئلة الميدتيرم</p>
+
+        <div class="stats-row">
+          <div class="stat-pill success">
+            <span>الإجابات الصحيحة: </span>
+            <strong id="correct-count">0</strong>
+          </div>
+          <div class="stat-pill danger">
+            <span>الإجابات الخاطئة: </span>
+            <strong id="wrong-count">0</strong>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 12px; justify-content: center; margin-top: 20px;">
+          <button class="btn-primary" onclick="restartQuiz()">🔄 إعادة الاختبار</button>
+          <button class="btn-secondary" onclick="showSettings()">⚙️ العودة للإعدادات</button>
+        </div>
+      </div>
+
+      <div id="wrong-review-container" class="wrong-review-section hidden">
+        <div class="wrong-review-title">
+          <span>⚠️ مراجعة الأسئلة التي أخطأت فيها (والإجابة النموذجية لكل سؤال):</span>
+        </div>
+        <div id="wrong-review-list"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+
+const QUESTIONS_DATA = [
+  {
+    "id": 1,
+    "question": "Rendering is the process of:",
+    "options": {
+      "A": "Rotating an object.",
+      "B": "Changing an object's size.",
+      "C": "Removing hidden objects.",
+      "D": "Generating the final 2D or 3D image."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 2,
+    "question": "Which task benefits the most from Interactive Computer Graphics?",
+    "options": {
+      "A": "Designing a 3D building while modifying it in real time.",
+      "B": "Editing a text document.",
+      "C": "Compressing image files.",
+      "D": "Reading a PDF."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 3,
+    "question": "Which pair consists entirely of graphics software or APIs mentioned in the lecture?",
+    "options": {
+      "A": "GPU and Blender.",
+      "B": "OpenGL and Unity.",
+      "C": "Plotter and Unity.",
+      "D": "VR Headset and OpenGL."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 4,
+    "question": "Which of the following is listed as graphics hardware in the lecture?",
+    "options": {
+      "A": "DirectX.",
+      "B": "Plotter.",
+      "C": "Unity.",
+      "D": "OpenGL."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 5,
+    "question": "Which operation directly changes an object's orientation?",
+    "options": {
+      "A": "Rotation.",
+      "B": "Blending.",
+      "C": "Rendering.",
+      "D": "Scaling."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 6,
+    "question": "Which software/API mentioned in the lecture is specifically designed for graphics programming?",
+    "options": {
+      "A": "Unity.",
+      "B": "Blender.",
+      "C": "OpenGL.",
+      "D": "Plotter."
+    },
+    "answer": "C"
+  },
+  {
+    "id": 7,
+    "question": "Which graphics operation combines two or more images, layers, or textures?",
+    "options": {
+      "A": "Clipping.",
+      "B": "Blending.",
+      "C": "Rasterization.",
+      "D": "Tessellation."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 8,
+    "question": "Which shading model is described in the lecture as providing smooth per-pixel lighting effects?",
+    "options": {
+      "A": "Phong Shading.",
+      "B": "Rasterization.",
+      "C": "Gouraud Shading.",
+      "D": "Flat Shading."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 9,
+    "question": "Why does clipping improve rendering efficiency?",
+    "options": {
+      "A": "It increases image brightness.",
+      "B": "It enlarges objects.",
+      "C": "It changes surface colors.",
+      "D": "It reduces unnecessary computations by removing non-visible parts."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 10,
+    "question": "A city planning department wants to visualize future road networks and population distribution. Which application of computer graphics is most appropriate?",
+    "options": {
+      "A": "Video games.",
+      "B": "Computer-Aided Design (CAD).",
+      "C": "Medical simulation.",
+      "D": "Computer-generated maps for planning."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 11,
+    "question": "Which of the following is NOT listed in the lecture as a computer graphics operation?",
+    "options": {
+      "A": "Rasterization.",
+      "B": "Compression.",
+      "C": "Anti-Aliasing.",
+      "D": "Tessellation."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 12,
+    "question": "Which statement correctly describes Interactive Computer Graphics according to the lecture?",
+    "options": {
+      "A": "It provides two-way communication between the computer and the user.",
+      "B": "It provides one-way communication.",
+      "C": "It is only used for 3D graphics.",
+      "D": "It is limited to Virtual Reality."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 13,
+    "question": "Enlarging an object without changing its orientation is an example of:",
+    "options": {
+      "A": "Shading.",
+      "B": "Clipping.",
+      "C": "Rendering.",
+      "D": "Scaling."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 14,
+    "question": "A pilot changes the aircraft direction in a flight simulator and the display updates immediately. This demonstrates:",
+    "options": {
+      "A": "Rendering only.",
+      "B": "Two-way communication.",
+      "C": "Rasterization.",
+      "D": "Animation only."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 15,
+    "question": "Which group consists entirely of graphics hardware?",
+    "options": {
+      "A": "GPU, Unity, Printer.",
+      "B": "GPU, VR headset, Plotter.",
+      "C": "OpenGL, Plotter, VR headset.",
+      "D": "Blender, Unity, OpenGL."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 16,
+    "question": "Which statement best distinguishes Interactive Computer Graphics (ICG) from traditional computer graphics?",
+    "options": {
+      "A": "ICG only displays 3D images.",
+      "B": "ICG provides two-way communication between the user and the computer.",
+      "C": "ICG only works with OpenGL.",
+      "D": "ICG requires a VR headset."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 17,
+    "question": "Which scenario is an example of Augmented Reality (AR)?",
+    "options": {
+      "A": "Creating engineering drawings.",
+      "B": "Viewing digital furniture inside a real room using a smartphone.",
+      "C": "Exploring a completely virtual world.",
+      "D": "Playing a 2D game."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 18,
+    "question": "A graphics system that only displays images without accepting user input is missing the key feature of:",
+    "options": {
+      "A": "Rendering.",
+      "B": "Animation.",
+      "C": "Interactive Computer Graphics.",
+      "D": "Shading."
+    },
+    "answer": "C"
+  },
+  {
+    "id": 19,
+    "question": "Which function is used to specify a vertex?",
+    "options": {
+      "A": "glutCreateWindow.",
+      "B": "glColor3f.",
+      "C": "glClearColor.",
+      "D": "glVertex2f."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 20,
+    "question": "Town planners mainly use computer graphics to:",
+    "options": {
+      "A": "Display planning data on computer-generated maps.",
+      "B": "Build databases.",
+      "C": "Design video games.",
+      "D": "Edit movies."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 21,
+    "question": "Which application allows users to manipulate variables and observe results immediately?",
+    "options": {
+      "A": "Medical imaging.",
+      "B": "Educational simulations.",
+      "C": "Cartoons.",
+      "D": "Visual effects."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 22,
+    "question": "Which example best illustrates two-way communication in Interactive Computer Graphics?",
+    "options": {
+      "A": "Viewing a photograph.",
+      "B": "Printing a poster.",
+      "C": "Rotating a 3D model using a mouse.",
+      "D": "Watching an animated movie."
+    },
+    "answer": "C"
+  },
+  {
+    "id": 23,
+    "question": "Which technology overlays digital objects onto the real world?",
+    "options": {
+      "A": "Augmented Reality.",
+      "B": "CAD.",
+      "C": "Animation.",
+      "D": "Virtual Reality."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 24,
+    "question": "Which graphics operation removes parts of objects outside the viewable area?",
+    "options": {
+      "A": "Animation.",
+      "B": "Blending.",
+      "C": "Shading.",
+      "D": "Clipping."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 25,
+    "question": "Which shading model applies a single color to each polygon?",
+    "options": {
+      "A": "Phong Shading.",
+      "B": "Gouraud Shading.",
+      "C": "Blending.",
+      "D": "Flat Shading."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 26,
+    "question": "Which software is mentioned in the lecture for 3D modeling and animation?",
+    "options": {
+      "A": "AutoCAD.",
+      "B": "DirectX.",
+      "C": "Blender.",
+      "D": "OpenGL."
+    },
+    "answer": "C"
+  },
+  {
+    "id": 27,
+    "question": "Which graphics operation generates the final visible image from a scene?",
+    "options": {
+      "A": "Scaling.",
+      "B": "Rendering.",
+      "C": "Clipping.",
+      "D": "Rotation."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 28,
+    "question": "Which application primarily involves creating and modifying 2D and 3D models?",
+    "options": {
+      "A": "Computer-Aided Design (CAD).",
+      "B": "Flight Simulation.",
+      "C": "Interactive Data Visualization.",
+      "D": "Medical Simulation."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 29,
+    "question": "Which application emphasizes interaction with charts, graphs, and maps?",
+    "options": {
+      "A": "Flight Simulation.",
+      "B": "Animation.",
+      "C": "Interactive Data Visualization.",
+      "D": "Medical Imaging."
+    },
+    "answer": "C"
+  },
+  {
+    "id": 30,
+    "question": "Which graphics operation determines the color of a surface based on lighting?",
+    "options": {
+      "A": "Transformation.",
+      "B": "Shading.",
+      "C": "Rendering.",
+      "D": "Clipping."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 31,
+    "question": "Which pair contains one graphics hardware device and one graphics software/API mentioned in the lecture?",
+    "options": {
+      "A": "Blender – OpenGL.",
+      "B": "Unity – Blender.",
+      "C": "GPU – Unity.",
+      "D": "Printer – Plotter."
+    },
+    "answer": "C"
+  },
+  {
+    "id": 32,
+    "question": "A function whose name begins with 'glu' belongs to which library?",
+    "options": {
+      "A": "GLUT.",
+      "B": "GLU.",
+      "C": "GPU.",
+      "D": "GL."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 33,
+    "question": "After OpenGL state initialization, what is the next step listed in the lecture?",
+    "options": {
+      "A": "End the program.",
+      "B": "Link libraries.",
+      "C": "Create a GPU.",
+      "D": "Register callbacks."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 34,
+    "question": "Which library is the core OpenGL library?",
+    "options": {
+      "A": "GLUT.",
+      "B": "GLAUX.",
+      "C": "GL.",
+      "D": "GLU."
+    },
+    "answer": "C"
+  },
+  {
+    "id": 35,
+    "question": "According to the lecture, which library is the only required OpenGL library?",
+    "options": {
+      "A": "All.",
+      "B": "GLU.",
+      "C": "GL.",
+      "D": "GLUT."
+    },
+    "answer": "C"
+  },
+  {
+    "id": 36,
+    "question": "Which function marks the end of a vertex list?",
+    "options": {
+      "A": "glutMainLoop.",
+      "B": "glEnd.",
+      "C": "glColor3f.",
+      "D": "glBegin."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 37,
+    "question": "Which GLUT function should be called to create a window?",
+    "options": {
+      "A": "glBegin.",
+      "B": "glEnd.",
+      "C": "glutCreateWindow.",
+      "D": "glutDisplayFunc."
+    },
+    "answer": "C"
+  },
+  {
+    "id": 38,
+    "question": "Which responsibility is NOT handled directly by OpenGL?",
+    "options": {
+      "A": "Graphics API operations.",
+      "B": "Window management.",
+      "C": "GPU interaction.",
+      "D": "Rendering."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 39,
+    "question": "Which function sets the background color?",
+    "options": {
+      "A": "glClearColor.",
+      "B": "gluOrtho2D.",
+      "C": "glColor3f.",
+      "D": "glVertex2f."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 40,
+    "question": "Which function defines a 2D projection?",
+    "options": {
+      "A": "glFlush.",
+      "B": "gluOrtho2D.",
+      "C": "glutCreateWindow.",
+      "D": "glColor3f."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 41,
+    "question": "Which function sets the current drawing color?",
+    "options": {
+      "A": "glClearColor.",
+      "B": "glColor3f.",
+      "C": "glBegin.",
+      "D": "glutDisplayFunc."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 42,
+    "question": "Which task is OpenGL primarily used for?",
+    "options": {
+      "A": "Word processing.",
+      "B": "Rendering 2D and 3D graphics.",
+      "C": "Database management.",
+      "D": "Networking."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 43,
+    "question": "Which library mainly handles window management in the lecture?",
+    "options": {
+      "A": "GPU.",
+      "B": "GL.",
+      "C": "GLU.",
+      "D": "GLUT."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 44,
+    "question": "Which sequence correctly represents specifying a geometric primitive?",
+    "options": {
+      "A": "glEnd → glVertex2f → glBegin.",
+      "B": "glColor3f → glEnd → glBegin.",
+      "C": "glVertex2f → glEnd → glBegin.",
+      "D": "glBegin → glVertex2f → glEnd."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 45,
+    "question": "OpenGL is best described as:",
+    "options": {
+      "A": "A compiler.",
+      "B": "An operating system.",
+      "C": "A graphics rendering API.",
+      "D": "A programming language."
+    },
+    "answer": "C"
+  },
+  {
+    "id": 46,
+    "question": "In the function name glColor3f, what does the '3' indicate?",
+    "options": {
+      "A": "Number of arguments.",
+      "B": "Library name.",
+      "C": "Float data type.",
+      "D": "Vector form."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 47,
+    "question": "Which property of OpenGL means it is not tied to a specific graphics hardware platform?",
+    "options": {
+      "A": "CPU dependent.",
+      "B": "Java based.",
+      "C": "Windows only.",
+      "D": "Hardware independent."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 48,
+    "question": "Which function registers the display callback?",
+    "options": {
+      "A": "glutKeyboardFunc.",
+      "B": "glutDisplayFunc.",
+      "C": "glutReshapeFunc.",
+      "D": "glutMainLoop."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 49,
+    "question": "Which function should be used to handle keyboard input?",
+    "options": {
+      "A": "glutCreateWindow.",
+      "B": "glutKeyboardFunc.",
+      "C": "glutReshapeFunc.",
+      "D": "glutDisplayFunc."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 50,
+    "question": "Which of the following is a geometric primitive?",
+    "options": {
+      "A": "GL_TRIANGLES.",
+      "B": "glutInit.",
+      "C": "glColor.",
+      "D": "glFlush."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 51,
+    "question": "After setup is complete, which function starts event processing?",
+    "options": {
+      "A": "glFlush.",
+      "B": "glutMainLoop.",
+      "C": "glBegin.",
+      "D": "glClear."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 52,
+    "question": "If an OpenGL program needs window management, which component is responsible for it?",
+    "options": {
+      "A": "GPU.",
+      "B": "Host environment.",
+      "C": "GL library.",
+      "D": "CPU."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 53,
+    "question": "OpenGL interacts mainly with which hardware component?",
+    "options": {
+      "A": "SSD.",
+      "B": "RAM.",
+      "C": "CPU.",
+      "D": "GPU."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 54,
+    "question": "In OpenGL, an attribute determines:",
+    "options": {
+      "A": "CPU speed.",
+      "B": "How a primitive is rendered.",
+      "C": "Window size.",
+      "D": "The file type."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 55,
+    "question": "What are all geometric primitives specified by?",
+    "options": {
+      "A": "Vertices.",
+      "B": "Windows.",
+      "C": "Colors.",
+      "D": "Buffers."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 56,
+    "question": "A programmer needs accessory graphics functions. Which library should be used?",
+    "options": {
+      "A": "GLUT.",
+      "B": "GLU.",
+      "C": "GL.",
+      "D": "GLAUX."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 57,
+    "question": "Which header file belongs to GLUT?",
+    "options": {
+      "A": "gl.h",
+      "B": "glu.h",
+      "C": "glut.h",
+      "D": "stdio.h"
+    },
+    "answer": "C"
+  },
+  {
+    "id": 58,
+    "question": "Which function marks the beginning of a vertex list?",
+    "options": {
+      "A": "glBegin.",
+      "B": "glClear.",
+      "C": "glEnd.",
+      "D": "glFlush."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 59,
+    "question": "When the window is resized, which callback function responds?",
+    "options": {
+      "A": "glutMainLoop.",
+      "B": "glutReshapeFunc.",
+      "C": "glutKeyboardFunc.",
+      "D": "glutDisplayFunc."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 60,
+    "question": "In the function name glColor3f, what does the suffix 'f' indicate?",
+    "options": {
+      "A": "Integer.",
+      "B": "Float.",
+      "C": "Boolean.",
+      "D": "Vector."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 61,
+    "question": "Delayed system responses are most likely to:",
+    "options": {
+      "A": "Degrade user experience.",
+      "B": "Improve usability.",
+      "C": "Increase flexibility.",
+      "D": "Improve consistency."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 62,
+    "question": "Which characteristic best distinguishes an interactive system from a traditional computing system?",
+    "options": {
+      "A": "Multiple databases.",
+      "B": "High processor speed.",
+      "C": "Large storage capacity.",
+      "D": "User-centered real-time interaction."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 63,
+    "question": "Good UI design focuses on:",
+    "options": {
+      "A": "Network routing.",
+      "B": "Database indexing.",
+      "C": "Memory allocation.",
+      "D": "Layout, typography, icons, and colors."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 64,
+    "question": "The back-end primarily:",
+    "options": {
+      "A": "Designs layouts.",
+      "B": "Processes, stores, and retrieves data.",
+      "C": "Creates typography.",
+      "D": "Displays icons."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 65,
+    "question": "Which design elements should remain consistent?",
+    "options": {
+      "A": "Buttons, colors, and navigation.",
+      "B": "Processors and memory.",
+      "C": "Storage devices.",
+      "D": "Databases."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 66,
+    "question": "Which statement best defines an interactive system?",
+    "options": {
+      "A": "A system that stores information for future retrieval.",
+      "B": "A system designed only for data analysis.",
+      "C": "A system that automatically replaces human interaction.",
+      "D": "A system that facilitates communication between users and technology through input, processing, and feedback."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 67,
+    "question": "The main purpose of feedback is to:",
+    "options": {
+      "A": "Improve database performance.",
+      "B": "Increase processing speed.",
+      "C": "Help users understand the results of their actions.",
+      "D": "Reduce storage."
+    },
+    "answer": "C"
+  },
+  {
+    "id": 68,
+    "question": "Which is NOT a key UI element?",
+    "options": {
+      "A": "Database tables.",
+      "B": "Menus.",
+      "C": "Icons.",
+      "D": "Buttons."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 69,
+    "question": "Which is a data output mechanism?",
+    "options": {
+      "A": "Voice command.",
+      "B": "Form.",
+      "C": "Gesture.",
+      "D": "Visual display."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 70,
+    "question": "Which is a data input mechanism?",
+    "options": {
+      "A": "Alert message.",
+      "B": "Visual display.",
+      "C": "Printed report.",
+      "D": "Voice command."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 71,
+    "question": "A robust back-end is important because it helps ensure:",
+    "options": {
+      "A": "Larger icons.",
+      "B": "Reliability and scalability.",
+      "C": "Better resolution.",
+      "D": "Faster typing."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 72,
+    "question": "Consistency mainly helps users:",
+    "options": {
+      "A": "Predict system behavior.",
+      "B": "Increase storage.",
+      "C": "Reduce memory usage.",
+      "D": "Improve internet connectivity."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 73,
+    "question": "Smooth data flow improves:",
+    "options": {
+      "A": "Interactivity.",
+      "B": "Hardware.",
+      "C": "Security.",
+      "D": "Storage."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 74,
+    "question": "Which set contains characteristics of ubiquitous computing listed in the lecture?",
+    "options": {
+      "A": "Menus, buttons, icons.",
+      "B": "CPU speed, storage, bandwidth.",
+      "C": "Context-awareness, embedded systems, invisible operation.",
+      "D": "Databases, servers, typography."
+    },
+    "answer": "C"
+  },
+  {
+    "id": 75,
+    "question": "When designing an interaction, which factors should receive the most attention?",
+    "options": {
+      "A": "Database structure.",
+      "B": "Hardware only.",
+      "C": "User goals, tasks, and contexts.",
+      "D": "Programming languages."
+    },
+    "answer": "C"
+  },
+  {
+    "id": 76,
+    "question": "IoT is presented as an application of:",
+    "options": {
+      "A": "Ubiquitous Computing.",
+      "B": "UI Design.",
+      "C": "System Response.",
+      "D": "Error Tolerance."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 77,
+    "question": "The User Interface (UI) is:",
+    "options": {
+      "A": "Operating system.",
+      "B": "Communication protocol.",
+      "C": "Database.",
+      "D": "Space where interaction occurs."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 78,
+    "question": "Which is the best example of ubiquitous computing?",
+    "options": {
+      "A": "Spreadsheet.",
+      "B": "Desktop compiler.",
+      "C": "Text editor.",
+      "D": "Smart home devices."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 79,
+    "question": "What is the main goal of ubiquitous computing?",
+    "options": {
+      "A": "Replace users.",
+      "B": "Reduce storage.",
+      "C": "Increase CPU speed.",
+      "D": "Integrate technology into everyday environments."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 80,
+    "question": "A system that automatically adjusts according to user preferences demonstrates:",
+    "options": {
+      "A": "Context-awareness.",
+      "B": "Typography.",
+      "C": "Error recovery.",
+      "D": "Data storage."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 81,
+    "question": "Which combination consists entirely of back-end support components?",
+    "options": {
+      "A": "Keyboard, touch, voice.",
+      "B": "Databases, servers, data processing engines.",
+      "C": "Menus, icons, typography.",
+      "D": "Buttons, colors, navigation."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 82,
+    "question": "A designer maps the steps a user follows to complete a task and tries to make them efficient and intuitive. This is primarily:",
+    "options": {
+      "A": "Back-end support.",
+      "B": "System response.",
+      "C": "Interaction design.",
+      "D": "Ubiquitous computing."
+    },
+    "answer": "C"
+  },
+  {
+    "id": 83,
+    "question": "Which feature is LEAST associated with usability?",
+    "options": {
+      "A": "Multiple customization options.",
+      "B": "Minimal errors.",
+      "C": "Low learning curve.",
+      "D": "Intuitive design."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 84,
+    "question": "Flexibility allows a system to:",
+    "options": {
+      "A": "Support different user preferences and contexts.",
+      "B": "Increase processor speed.",
+      "C": "Improve internet speed.",
+      "D": "Store larger files."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 85,
+    "question": "Which situation best demonstrates visual feedback?",
+    "options": {
+      "A": "Phone vibration.",
+      "B": "Voice notification.",
+      "C": "Progress bar while uploading.",
+      "D": "Alarm sound."
+    },
+    "answer": "C"
+  },
+  {
+    "id": 86,
+    "question": "Automatic adjustment based on user preferences demonstrates:",
+    "options": {
+      "A": "Error recovery.",
+      "B": "Data storage.",
+      "C": "Typography.",
+      "D": "Context-awareness."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 87,
+    "question": "A system that is easy to learn and minimizes user errors demonstrates:",
+    "options": {
+      "A": "Consistency.",
+      "B": "Usability.",
+      "C": "Flexibility.",
+      "D": "Feedback."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 88,
+    "question": "Which option demonstrates multiple input methods?",
+    "options": {
+      "A": "CPU, RAM, storage.",
+      "B": "Keyboard, touch, and voice.",
+      "C": "Server, database, network.",
+      "D": "Mouse, monitor, printer."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 89,
+    "question": "Which feedback type is represented by an alert sound?",
+    "options": {
+      "A": "Visual.",
+      "B": "Haptic.",
+      "C": "Auditory.",
+      "D": "Graphical."
+    },
+    "answer": "C"
+  },
+  {
+    "id": 90,
+    "question": "In ubiquitous computing, technology operating unobtrusively in the background demonstrates:",
+    "options": {
+      "A": "Invisibility.",
+      "B": "Scalability.",
+      "C": "Databases.",
+      "D": "Networking."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 91,
+    "question": "Which application of ubiquitous computing is mentioned in the lecture?",
+    "options": {
+      "A": "Antivirus.",
+      "B": "DBMS.",
+      "C": "Wearable devices.",
+      "D": "Operating system."
+    },
+    "answer": "C"
+  },
+  {
+    "id": 92,
+    "question": "When submitting an incomplete form, the system should:",
+    "options": {
+      "A": "Ignore.",
+      "B": "Restart.",
+      "C": "Display a clear error message.",
+      "D": "Close."
+    },
+    "answer": "C"
+  },
+  {
+    "id": 93,
+    "question": "Interactive systems improve digital experiences primarily by increasing:",
+    "options": {
+      "A": "Data compression.",
+      "B": "Network bandwidth.",
+      "C": "User satisfaction and engagement.",
+      "D": "Processor utilization."
+    },
+    "answer": "C"
+  },
+  {
+    "id": 94,
+    "question": "Which feature best represents Error Tolerance?",
+    "options": {
+      "A": "Search.",
+      "B": "Undo button.",
+      "C": "Navigation menu.",
+      "D": "Progress indicator."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 95,
+    "question": "Which of the following is NOT listed in the lecture as an example of an interactive system?",
+    "options": {
+      "A": "Compiler.",
+      "B": "Voice assistant.",
+      "C": "Web application.",
+      "D": "Mobile application."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 96,
+    "question": "System response refers to:",
+    "options": {
+      "A": "How quickly and meaningfully the system reacts.",
+      "B": "Interface size.",
+      "C": "Data stored.",
+      "D": "Number of users."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 97,
+    "question": "Ubiquitous computing is also known as:",
+    "options": {
+      "A": "Distributed computing.",
+      "B": "Cloud computing.",
+      "C": "Pervasive computing.",
+      "D": "Parallel computing."
+    },
+    "answer": "C"
+  },
+  {
+    "id": 98,
+    "question": "Which statement correctly describes ubiquitous computing in relation to interactive systems?",
+    "options": {
+      "A": "It only improves network speed.",
+      "B": "It focuses only on databases.",
+      "C": "It eliminates user interaction.",
+      "D": "It extends interactive systems by embedding technology into everyday environments."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 99,
+    "question": "Which best demonstrates flexibility?",
+    "options": {
+      "A": "Permanent layout.",
+      "B": "Fixed interface.",
+      "C": "Single input method.",
+      "D": "Dashboard customization."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 100,
+    "question": "Which set contains the key metrics of system response listed in the lecture?",
+    "options": {
+      "A": "Speed, memory, storage.",
+      "B": "Speed, accuracy, appropriateness.",
+      "C": "Reliability, security, storage.",
+      "D": "Accuracy, CPU, bandwidth."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 101,
+    "question": "How should usability testing participants be treated?",
+    "options": {
+      "A": "As if they are the problem.",
+      "B": "With hidden mandatory participation.",
+      "C": "Without any explanation.",
+      "D": "With respect and informed that the interface is being tested."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 102,
+    "question": "What is the purpose of external analytics?",
+    "options": {
+      "A": "To print all web pages.",
+      "B": "To remove all backlinks.",
+      "C": "To analyze search engine performance and compare similar websites.",
+      "D": "To interview employees only."
+    },
+    "answer": "C"
+  },
+  {
+    "id": 103,
+    "question": "Which of the following is an expert review method?",
+    "options": {
+      "A": "Random guessing.",
+      "B": "Database normalization.",
+      "C": "Advertising analysis.",
+      "D": "Heuristic evaluation."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 104,
+    "question": "What is summative evaluation?",
+    "options": {
+      "A": "Evaluation before any design idea exists.",
+      "B": "A method for choosing colors randomly.",
+      "C": "A test with no success criteria.",
+      "D": "Evaluation near the end that provides evidence about the product."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 105,
+    "question": "What is markerless AR?",
+    "options": {
+      "A": "AR that replaces the real world completely.",
+      "B": "AR that requires a predefined printed QR marker.",
+      "C": "AR that works without any camera or sensors.",
+      "D": "AR that does not require predefined markers."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 106,
+    "question": "Before evaluating a website, what should be clarified first?",
+    "options": {
+      "A": "The computer brand used.",
+      "B": "The color of the office walls.",
+      "C": "The website purpose and audience.",
+      "D": "The number of staff members."
+    },
+    "answer": "C"
+  },
+  {
+    "id": 107,
+    "question": "What is a conversion funnel?",
+    "options": {
+      "A": "A type of keyboard shortcut.",
+      "B": "The steps users take to achieve a website goal.",
+      "C": "A tool for cleaning screens.",
+      "D": "A list of unrelated images."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 108,
+    "question": "What does SLAM stand for in AR?",
+    "options": {
+      "A": "Simultaneous Localization and Mapping.",
+      "B": "System Language and Memory.",
+      "C": "Simple Light Adjustment Method.",
+      "D": "Sensor Layout Animation Model."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 109,
+    "question": "What is paper mockup testing?",
+    "options": {
+      "A": "Testing only printed manuals.",
+      "B": "Testing server hardware.",
+      "C": "Testing by writing final code first.",
+      "D": "Testing using paper versions of screen displays."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 110,
+    "question": "During a cognitive walkthrough, what should experts check?",
+    "options": {
+      "A": "Whether the product name is short.",
+      "B": "Whether the logo is animated.",
+      "C": "Whether the interface has the largest file size.",
+      "D": "Whether users know what to do and understand feedback."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 111,
+    "question": "What are audience avatars used for?",
+    "options": {
+      "A": "Compressing image files.",
+      "B": "Counting broken chairs.",
+      "C": "Writing server code only.",
+      "D": "Creating profiles of target users to understand needs and motivations."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 112,
+    "question": "What does page count measure in external analytics?",
+    "options": {
+      "A": "The number of pages indexed by Google for a domain.",
+      "B": "The number of user passwords.",
+      "C": "The number of website colors.",
+      "D": "The number of office pages printed."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 113,
+    "question": "What does a Usability Analyst often specialize in?",
+    "options": {
+      "A": "Conducting usability tests and user research.",
+      "B": "Designing computer chips.",
+      "C": "Managing payroll records.",
+      "D": "Writing legal contracts."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 114,
+    "question": "What is Augmented Reality (AR)?",
+    "options": {
+      "A": "The overlay of digital information onto the real world.",
+      "B": "A complete replacement of the real world with a virtual world.",
+      "C": "A method for storing data in cloud databases.",
+      "D": "A type of physical robot used in factories."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 115,
+    "question": "What does a User Researcher do?",
+    "options": {
+      "A": "Only writes database queries.",
+      "B": "Only repairs computer hardware.",
+      "C": "Only selects fonts for posters.",
+      "D": "Interviews, surveys, and observes users to understand them and their context."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 116,
+    "question": "What does an Interaction Designer mainly define?",
+    "options": {
+      "A": "The behavior of interactive products and user experience flow over time.",
+      "B": "The office seating plan.",
+      "C": "The product price list.",
+      "D": "The number of servers only."
+    },
+    "answer": "A"
+  },
+  {
+    "id": 117,
+    "question": "What does a User Interface Designer focus on?",
+    "options": {
+      "A": "Only network cables.",
+      "B": "Only financial accounting.",
+      "C": "Only physical delivery of products.",
+      "D": "The design of user interfaces, often including technical interface aspects."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 118,
+    "question": "What is a cognitive walkthrough?",
+    "options": {
+      "A": "A tool for hardware repair.",
+      "B": "Experts simulate users carrying out typical tasks.",
+      "C": "Users design database tables.",
+      "D": "Managers vote on colors only."
+    },
+    "answer": "B"
+  },
+  {
+    "id": 119,
+    "question": "What is the role of an Information Architect?",
+    "options": {
+      "A": "Replacing all user feedback.",
+      "B": "Writing only assembly code.",
+      "C": "Designing building foundations only.",
+      "D": "Organizing and presenting information for intuitive access and ease of use."
+    },
+    "answer": "D"
+  },
+  {
+    "id": 120,
+    "question": "Which tool category is used to collect SEO data?",
+    "options": {
+      "A": "Paint tools.",
+      "B": "Video editors.",
+      "C": "SEO tools such as Ahrefs, Moz, or Ubersuggest.",
+      "D": "Spreadsheet fonts."
+    },
+    "answer": "C"
+  }
+];
+
+    let quizQuestions = [];
+    let currentIndex = 0;
+    let userAnswers = {};
+    let displayMode = 'single';
+    let orderMode = 'seq';
+
+    function updateSettingsUI() {
+      const modeSingle = document.querySelector('input[name="display-mode"][value="single"]').checked;
+      const orderSeq = document.querySelector('input[name="order-mode"][value="seq"]').checked;
+
+      document.getElementById('lbl-mode-single').classList.toggle('selected', modeSingle);
+      document.getElementById('lbl-mode-all').classList.toggle('selected', !modeSingle);
+
+      document.getElementById('lbl-order-seq').classList.toggle('selected', orderSeq);
+      document.getElementById('lbl-order-rand').classList.toggle('selected', !orderSeq);
+    }
+
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function startQuiz() {
+      displayMode = document.querySelector('input[name="display-mode"]:checked').value;
+      orderMode = document.querySelector('input[name="order-mode"]:checked').value;
+
+      if (orderMode === 'rand') {
+        quizQuestions = shuffleArray(QUESTIONS_DATA);
+      } else {
+        quizQuestions = [...QUESTIONS_DATA];
+      }
+
+      currentIndex = 0;
+      userAnswers = {};
+
+      document.getElementById('screen-settings').classList.add('hidden');
+      document.getElementById('screen-result').classList.add('hidden');
+      document.getElementById('screen-quiz').classList.remove('hidden');
+
+      if (displayMode === 'single') {
+        document.getElementById('single-header-info').classList.remove('hidden');
+        document.getElementById('single-nav').classList.remove('hidden');
+        document.getElementById('all-submit-bar').classList.add('hidden');
+        renderSingleQuestion();
+      } else {
+        document.getElementById('single-header-info').classList.add('hidden');
+        document.getElementById('single-nav').classList.add('hidden');
+        document.getElementById('all-submit-bar').classList.remove('hidden');
+        renderAllQuestions();
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderSingleQuestion() {
+      const q = quizQuestions[currentIndex];
+      const container = document.getElementById('questions-container');
+      
+      const total = quizQuestions.length;
+      document.getElementById('q-counter-text').innerText = 'السؤال ' + (currentIndex + 1) + ' من ' + total;
+      const progressPct = ((currentIndex + 1) / total) * 100;
+      document.getElementById('progress-fill').style.width = progressPct + '%';
+
+      let correctSoFar = 0;
+      Object.keys(userAnswers).forEach(qid => {
+        const qObj = quizQuestions.find(item => item.id == qid);
+        if (qObj && userAnswers[qid] === qObj.answer) {
+          correctSoFar++;
+        }
+      });
+      document.getElementById('q-score-live').innerText = 'الإجابات الصحيحة: ' + correctSoFar;
+
+      document.getElementById('btn-prev').disabled = currentIndex === 0;
+      const nextBtn = document.getElementById('btn-next');
+      if (currentIndex === total - 1) {
+        nextBtn.innerText = '🏁 إنهاء الاختبار';
+      } else {
+        nextBtn.innerText = 'التالي ⬅️';
+      }
+
+      container.innerHTML = createQuestionHTML(q, currentIndex + 1);
+    }
+
+    function renderAllQuestions() {
+      const container = document.getElementById('questions-container');
+      let html = '';
+      quizQuestions.forEach((q, idx) => {
+        html += '<div class="card">' + createQuestionHTML(q, idx + 1) + '</div>';
+      });
+      container.innerHTML = html;
+      updateAllAnsweredCount();
+    }
+
+    function createQuestionHTML(q, displayNum) {
+      const currentAns = userAnswers[q.id];
+      const isAnswered = currentAns !== undefined;
+
+      let optionsHTML = '';
+      const letters = ['A', 'B', 'C', 'D'];
+
+      letters.forEach(letter => {
+        const text = q.options[letter];
+        if (!text) return;
+
+        let btnClass = 'opt-btn';
+        if (isAnswered) {
+          if (letter === q.answer) {
+            btnClass += ' correct';
+          } else if (letter === currentAns) {
+            btnClass += ' wrong';
+          }
+        }
+
+        const disabledAttr = isAnswered ? 'disabled' : '';
+
+        optionsHTML += '<button class="' + btnClass + '" onclick="handleAnswerSelect(' + q.id + ', \'' + letter + '\')" ' + disabledAttr + '>'
+          + '<div style="display:flex; align-items:center;">'
+          + '<span class="opt-letter">' + letter + '</span>'
+          + '<span>' + text + '</span>'
+          + '</div>'
+          + (isAnswered && letter === q.answer ? '<span style="font-size:1.1rem;">✅</span>' : '')
+          + (isAnswered && letter === currentAns && letter !== q.answer ? '<span style="font-size:1.1rem;">❌</span>' : '')
+          + '</button>';
+      });
+
+      let feedbackHTML = '';
+      if (isAnswered) {
+        if (currentAns === q.answer) {
+          feedbackHTML = '<div class="feedback-msg correct">🎉 إجابة صحيحة! أحسنت.</div>';
+        } else {
+          feedbackHTML = '<div class="feedback-msg wrong">❌ إجابة خاطئة! الإجابة النموذجية هي: <strong>(' + q.answer + ') ' + q.options[q.answer] + '</strong></div>';
+        }
+      }
+
+      return '<div class="q-box" id="q-box-' + q.id + '">'
+        + '<div class="q-title"><span class="q-number-tag">Q' + displayNum + '</span> ' + q.question + '</div>'
+        + '<div class="options-grid">' + optionsHTML + '</div>'
+        + feedbackHTML
+        + '</div>';
+    }
+
+    function handleAnswerSelect(questionId, selectedLetter) {
+      if (userAnswers[questionId] !== undefined) return;
+
+      userAnswers[questionId] = selectedLetter;
+
+      if (displayMode === 'single') {
+        renderSingleQuestion();
+      } else {
+        const q = quizQuestions.find(item => item.id === questionId);
+        const idx = quizQuestions.findIndex(item => item.id === questionId);
+        const qBox = document.getElementById('q-box-' + questionId);
+        if (qBox) {
+          qBox.outerHTML = createQuestionHTML(q, idx + 1);
+        }
+        updateAllAnsweredCount();
+      }
+    }
+
+    function updateAllAnsweredCount() {
+      const answered = Object.keys(userAnswers).length;
+      const total = quizQuestions.length;
+      document.getElementById('all-answered-count').innerText = 'تم الإجابة على ' + answered + ' من ' + total;
+    }
+
+    function nextQuestion() {
+      if (currentIndex < quizQuestions.length - 1) {
+        currentIndex++;
+        renderSingleQuestion();
+        window.scrollTo({ top: 120, behavior: 'smooth' });
+      } else {
+        finishQuiz();
+      }
+    }
+
+    function prevQuestion() {
+      if (currentIndex > 0) {
+        currentIndex--;
+        renderSingleQuestion();
+        window.scrollTo({ top: 120, behavior: 'smooth' });
+      }
+    }
+
+    function confirmRestart() {
+      if (confirm('هل تريد العودة لشاشة الإعدادات وبدء تدريب جديد؟')) {
+        showSettings();
+      }
+    }
+
+    function finishQuiz() {
+      document.getElementById('screen-quiz').classList.add('hidden');
+      document.getElementById('screen-result').classList.remove('hidden');
+
+      let correct = 0;
+      let wrongList = [];
+
+      quizQuestions.forEach(q => {
+        const uAns = userAnswers[q.id];
+        if (uAns === q.answer) {
+          correct++;
+        } else {
+          wrongList.push({
+            q: q,
+            userAns: uAns || 'لم تتم الإجابة'
+          });
+        }
+      });
+
+      const total = quizQuestions.length;
+      const pct = Math.round((correct / total) * 100);
+
+      document.getElementById('final-percentage').innerText = pct + '%';
+      document.getElementById('correct-count').innerText = correct;
+      document.getElementById('wrong-count').innerText = wrongList.length;
+
+      let msg = '';
+      if (pct >= 90) msg = '🌟 ما شاء الله! أداء ممتاز ومستوى رائع جداً!';
+      else if (pct >= 75) msg = '👏 نتيجة جيدة جداً! مراجعة بسيطة للأخطاء وتضمن الدرجة النهائية.';
+      else if (pct >= 50) msg = '👍 أداء لا بأس به، راجع الأسئلة التي أخطأت فيها بالأسفل وكرر الاختبار.';
+      else msg = '💪 محاولة أولى للتعلم! ألقِ نظرة على الإجابات النموذجية بالأسفل وحاول مجدداً.';
+
+      document.getElementById('result-message').innerText = msg;
+
+      const reviewSection = document.getElementById('wrong-review-container');
+      const reviewList = document.getElementById('wrong-review-list');
+
+      if (wrongList.length > 0) {
+        reviewSection.classList.remove('hidden');
+        let reviewHTML = '';
+        wrongList.forEach((item, i) => {
+          const q = item.q;
+          const userChoiceText = q.options[item.userAns] ? '(' + item.userAns + ') ' + q.options[item.userAns] : item.userAns;
+          const correctChoiceText = '(' + q.answer + ') ' + q.options[q.answer];
+
+          reviewHTML += '<div class="review-item">'
+            + '<div class="review-q"><span class="q-number-tag">Q' + q.id + '</span> ' + q.question + '</div>'
+            + '<div class="review-answer-row review-your-ans">❌ إجابتك: ' + userChoiceText + '</div>'
+            + '<div class="review-answer-row review-correct-ans">✅ الإجابة الصحيحة: ' + correctChoiceText + '</div>'
+            + '</div>';
+        });
+        reviewList.innerHTML = reviewHTML;
+      } else {
+        reviewSection.classList.add('hidden');
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function restartQuiz() {
+      startQuiz();
+    }
+
+    function showSettings() {
+      document.getElementById('screen-quiz').classList.add('hidden');
+      document.getElementById('screen-result').classList.add('hidden');
+      document.getElementById('screen-settings').classList.remove('hidden');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  </script>
+</body>
+</html>
